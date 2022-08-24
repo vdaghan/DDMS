@@ -1,4 +1,6 @@
+projects/**
 **/slprj
 **/*.slxc
 **/*.asv
-networkConfig.json
+autoconnectTargets.json
+benchmarkResult.json
