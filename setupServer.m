@@ -4,6 +4,11 @@ function server = setupServer()
     serverAddress = resolvehost(hostname,"address");
     server = tcpserver(serverAddress, 6666);
     configureCallback(server, "terminator", @bytesAvailableFunction);
-    server.ConnectionChangedFcn = @(src, ~)connectionChangedFcn(true, src);
+    server.ConnectionChangedFcn = @serverConnectionChangedFcn;
     server.Timeout = 3;
+    server.UserData = containers.Map();
+
+    function serverConnectionChangedFcn(src, ~)
+        connectionChangedFcn(true, src);
+    end
 end

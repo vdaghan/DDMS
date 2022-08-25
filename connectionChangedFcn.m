@@ -1,23 +1,18 @@
 function connectionChangedFcn(fromServer, src, ~)
-    global clientMap;
     if src.Connected
-        client = containers.Map();
-        client('lastSeen') = datetime;
-        client('address') = src.ClientAddress;
-        client('connected') = true;
-        client('port') = src.ClientPort;
+        src.UserData('lastSeen') = datetime;
+        src.UserData('address') = src.ClientAddress;
+        src.UserData('connected') = true;
+        src.UserData('port') = src.ClientPort;
         if (fromServer)
-            client('type') = "client";
+            src.UserData('type') = "client";
         else
-            client('type') = "server";
+            src.UserData('type') = "server";
         end
-        clientMap(src.ClientAddress) = client;
         display("Client " + src.ClientAddress + " is now connected.")
     else
-        client = clientMap(src.ClientAddress);
-        client('lastSeen') = datetime;
-        client('connected') = false;
-        clientMap(src.ClientAddress) = client;
+        src.UserData('lastSeen') = datetime;
+        src.UserData('connected') = false;
         display("Client " + src.ClientAddress + " is now disconnected.")
     end
 end

@@ -9,6 +9,13 @@ server = setupServer();
 
 autoconnectTargets = getAutoconnectTargets();
 for target = autoconnectTargets
-    client = tcpclient(target.address, target.port, "Timeout", 5);
-    clientMap(client.Address) = client;
+    clientMap(target.address) = setupClient(target);
+end
+
+loop = true;
+while (loop)
+    for key = keys(clientMap)
+        clientData = clientMap(key{1}).UserData;
+    end
+    loop = false;
 end
