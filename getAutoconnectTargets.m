@@ -2,11 +2,13 @@ function autoconnectTargets = getAutoconnectTargets()
     autoconnectTargets = {};
     if (~isfile('autoconnectTargets.json'))
         autoconnectTarget = struct();
-        autoconnectTarget.address = input("Please enter server address (Leave blank for this computer):\n", "s");
-        if (isempty(autoconnectTarget.address))
+        userInput = input("Please enter server address (Leave blank for this computer):\n", "s");
+        if (isempty(userInput))
             [~,hostname] = system('hostname');
             hostname = string(strtrim(hostname));
             autoconnectTarget.address = resolvehost(hostname,"address");
+        elseif (strcmp("-", userInput))
+            return;
         end
         autoconnectTarget.port = 6666;
         autoconnectTargets{1} = autoconnectTarget;
