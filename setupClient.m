@@ -4,4 +4,5 @@ function client = setupClient(target)
     client.ErrorOccurredFcn = @errorOccurredFcn;
     client.Timeout = 3;
     client.UserData = containers.Map();
+    client.UserData('packets') = containers.Map();
 end

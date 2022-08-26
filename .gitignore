@@ -4,3 +4,5 @@ projects/**
 **/*.asv
 autoconnectTargets.json
 benchmarkResult.json
+trackedDirectory.json
+/test/**
