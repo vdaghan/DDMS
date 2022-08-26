@@ -7,7 +7,8 @@ properties = collectProperties();
 projects = findProjects();
 projectSettings = getProjectSettings('handstand');
 localAddress = getLocalAddress();
-nodeMap(localAddress) = Node('server', localAddress);
+server = Node('server', localAddress);
+%nodeMap(localAddress) = 
 
 simulationQueue = SimulationQueue();
 simulationInputs = containers.Map();
