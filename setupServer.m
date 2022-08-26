@@ -1,5 +1,6 @@
-function server = setupServer(serverAddress)
-    server = tcpserver(serverAddress, 6666);
+function server = setupServer(target)
+    fprintf("Setting up server as %s.\n", target.address);
+    server = tcpserver(target.address, target.port);
     configureCallback(server, "terminator", @bytesAvailableFunction);
     server.ConnectionChangedFcn = @serverConnectionChangedFcn;
     server.Timeout = 3;

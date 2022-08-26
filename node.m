@@ -28,20 +28,21 @@ classdef Node
             target = struct();
             target.address = obj.connectionAddress;
             target.port = obj.connectionPort;
+            fprintf("Connecting to %s at %d.\n", target.address, target.port);
             obj.connectionStatus = 'connecting';
             if (strcmp('server', obj.connectionType))
                 try
                     obj.connectionSocket = setupServer(target);
                 catch
                     obj.connectionStatus = 'not_connected';
-                    warning("Could not connect to server at address " + target.address);
+                    warning("Could not setup server at address " + target.address);
                 end
             elseif (strcmp('client', obj.connectionType))
                 try
                     obj.connectionSocket = setupClient(target);
                 catch
                     obj.connectionStatus = 'not_connected';
-                    warning("Could not connect to client at address " + target.address);
+                    warning("Could not connect to server at address " + target.address);
                 end
             else
                 obj.connectionStatus = 'error';

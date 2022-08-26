@@ -8,13 +8,12 @@ projects = findProjects();
 projectSettings = getProjectSettings('handstand');
 localAddress = getLocalAddress();
 server = Node('server', localAddress);
-%nodeMap(localAddress) = 
+server.connect();
 
 simulationQueue = SimulationQueue();
 simulationInputs = containers.Map();
 simulationOutputs = containers.Map();
 outgoingPackets = containers.Map();
-lastOutgoingPacketId = 0;
 
 autoconnectTargets = getAutoconnectTargets();
 for target = autoconnectTargets
@@ -87,5 +86,7 @@ while (loop)
 
     % Do some simulation
 
-    loop = false;
+    %loop = false;
+    fprintf(".");
+    pause(0.2);
 end
