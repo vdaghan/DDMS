@@ -12,14 +12,23 @@ classdef SimulationQueue
             obj.queue(id) = data;
         end
 
-        function [data, id] = pop(obj)
+        function [data, id] = pop(obj, varargin)
             % TODO: Find out how does keys() function return values and
             % clean this up
-            for queueKeyCell = keys(obj.queue)
-                id = queueKeyCell{1};
-                data = obj.queue(id);
-                remove(obj.queue, id);
-                break;
+            if 0 == size(varargin)
+                num = 1;
+            else
+                num = varargin{1};
+            end
+            data = [];
+            id = [];
+            for i = 1:num
+                for queueKeyCell = keys(obj.queue)
+                    id(i) = queueKeyCell{1};
+                    data(i) = obj.queue(id(i));
+                    remove(obj.queue, id(i));
+                    break;
+                end
             end
         end
     end

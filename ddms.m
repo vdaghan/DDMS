@@ -1,18 +1,20 @@
 clc;
 clear;
 
+% TODO: zip tracked folder as we process them
+
 nodeMap = containers.Map();
 
 properties = collectProperties();
 projects = findProjects();
 projectSettings = getProjectSettings('handstand');
 localAddress = getLocalAddress();
+inputTracker = InputTracker();
 server = Node('server', localAddress);
 server.connect();
 
 simulationQueue = SimulationQueue();
-simulationInputs = containers.Map();
-simulationOutputs = containers.Map();
+resultQueue = SimulationQueue();
 outgoingPackets = containers.Map();
 
 autoconnectTargets = getAutoconnectTargets();
@@ -22,6 +24,9 @@ end
 
 loop = true;
 while (loop)
+    % Track inputs if there is any
+    inputTracker.update();
+    
     % Process incoming packets
     for keyCell = keys(nodeMap)
         key = keyCell{1};
@@ -81,10 +86,19 @@ while (loop)
         key = keyCell{1};
         nodeMap(key).trySendPackets();
     end
+    
+    % Collect simulation inputs
 
     % Distribute simulation inputs
 
-    % Do some simulation
+    % Do some simulation and record outputs
+    simulationInputs = simulationQueue.pop(properties.numCores * 2);
+    if ~isempty(simulationInputs)
+        simulationOutputs = parsim(simulationInputs);
+        for i = 1:length(simulationOutputs)
+            resultQueue.push(simulationOutputs(i));
+        end
+    end
 
     %loop = false;
     fprintf(".");

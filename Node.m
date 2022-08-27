@@ -87,6 +87,9 @@ classdef Node
         end
 
         function obj = trySendPackets(obj)
+            if isempty(obj.sendQueue)
+                return;
+            end
             if (~obj.connected())
                 obj.connect();
                 return;
