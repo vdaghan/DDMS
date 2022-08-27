@@ -8,6 +8,14 @@ classdef SimulationQueue
             obj.queue = containers.Map('KeyType', 'uint32', 'ValueType', 'any');
         end
 
+        function l = length(obj)
+            l = length(obj.queue);
+        end
+
+        function b = isempty(obj)
+            b = isempty(obj.queue);
+        end
+
         function obj = push(obj, id, data)
             obj.queue(id) = data;
         end
@@ -17,6 +25,8 @@ classdef SimulationQueue
             % clean this up
             if 0 == size(varargin)
                 num = 1;
+            elseif -1 == varargin{1}
+                num = length(keys(obj.queue));
             else
                 num = varargin{1};
             end

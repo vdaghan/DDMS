@@ -32,6 +32,7 @@ while (loop)
             for simID = simIDList
                 simulationObject = inputTracker.decodeSimulationInput(simID);
                 simulationInput = Simulink.SimulationInput(projectSettings.name);
+                simulationInput = simulationInput.setVariable('simulationId', simID); % This is stupid...
                 fnames = fieldnames(simulationObject);
                 for findex = 1:length(fnames)
                     fieldName = fnames{findex};
@@ -107,11 +108,21 @@ while (loop)
     % Distribute simulation inputs
 
     % Do some simulation and record outputs
-    simulationInputs = simulationQueue.pop(properties.numCores * 2);
+    simulationInputs = simulationQueue.pop(properties.numCores * 5);
+    %simulationInputs = simulationQueue.pop(-1);
     if ~isempty(simulationInputs)
         simulationOutputs = parsim([simulationInputs{:}]);
         for i = 1:length(simulationOutputs)
-            resultQueue.push(simulationOutputs(i));
+            simID = simulationInputs{i}.Variables(1).Value;
+            resultQueue.push(simID, simulationOutputs(i));
+        end
+    end
+    
+    % Track inputs if there is any
+    if inputTracker.tracks()
+        while ~resultQueue.isempty()
+            [data, id] = resultQueue.pop();
+            inputTracker.encodeSimulationOutput(id, data{1});
         end
     end
 

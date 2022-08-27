@@ -57,6 +57,8 @@ classdef InputTracker
             processedFilesToNote = setdiff(processedFiles, obj.processedInputFiles);
             obj.processedInputFiles = union(obj.processedInputFiles, processedFilesToNote);
             
+            obj.inprocessInputFiles = setdiff(obj.inprocessInputFiles, obj.processedInputFiles);
+            
             obj.unprocessedInputFiles = setdiff(setdiff(inputFiles, outputFiles), obj.inprocessInputFiles);
         end
         
@@ -77,6 +79,20 @@ classdef InputTracker
         function jsonObject = decodeSimulationInput(obj, simID)
             jsonText = fileread(obj.directory + "/" + num2str(simID) + "_in.json");
             jsonObject = jsondecode(jsonText);
+        end
+        function obj = encodeSimulationOutput(obj, simID, simulationOutput)
+            ignoredFields = {'tout', 'xout'};
+            fields = who(simulationOutput);
+            fields = setdiff(fields, ignoredFields);
+            jsonObject = struct();
+            for i = 1:length(fields)
+                field = fields{i};
+                jsonObject.(field) = simulationOutput.(field);
+            end
+            encodedJson = jsonencode(jsonObject);
+            fid = fopen(obj.directory + "/" + string(simID) + "_out.json", 'w');
+            fprintf(fid, "%s", encodedJson);
+            fclose(fid);
         end
     end
     methods(Static)
