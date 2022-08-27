@@ -25,7 +25,22 @@ end
 loop = true;
 while (loop)
     % Track inputs if there is any
-    inputTracker.update();
+    if inputTracker.tracks()
+        inputTracker = inputTracker.update(); % This is stupid...
+        [inputTracker, simIDList] = inputTracker.reserveFilesToProcess(-1);
+        if ~isempty(simIDList)
+            for simID = simIDList
+                simulationObject = inputTracker.decodeSimulationInput(simID);
+                simulationInput = Simulink.SimulationInput(projectSettings.name);
+                fnames = fieldnames(simulationObject);
+                for findex = 1:length(fnames)
+                    fieldName = fnames{findex};
+                    simulationInput = simulationInput.setVariable(fieldName, simulationObject.(fieldName)); % This is stupid...
+                end
+                simulationQueue.push(simID, simulationInput);
+            end
+        end
+    end
     
     % Process incoming packets
     for keyCell = keys(nodeMap)
@@ -94,7 +109,7 @@ while (loop)
     % Do some simulation and record outputs
     simulationInputs = simulationQueue.pop(properties.numCores * 2);
     if ~isempty(simulationInputs)
-        simulationOutputs = parsim(simulationInputs);
+        simulationOutputs = parsim([simulationInputs{:}]);
         for i = 1:length(simulationOutputs)
             resultQueue.push(simulationOutputs(i));
         end

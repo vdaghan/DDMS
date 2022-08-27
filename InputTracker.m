@@ -26,6 +26,10 @@ classdef InputTracker
             end
         end
         
+        function retVal = tracks(obj)
+            retVal = obj.canTrack;
+        end
+        
         function obj = update(obj)
             filesInDirectory = dir(obj.directory);
             filesInDirectory = filesInDirectory(~[filesInDirectory.isdir]);
@@ -36,13 +40,14 @@ classdef InputTracker
             end
             inputFiles = [];
             outputFiles = [];
-            for file = filesInDirectory
+            for fileIndex = 1:length(filesInDirectory)
+                file = filesInDirectory(fileIndex);
                 fileName = file.name;
                 [simID, type] = InputTracker.parseFileName(fileName);
                 if strcmp('in', type)
-                    inputFiles(end+1) = sscanf(simID, '%u');
+                    inputFiles(end+1) = simID;
                 elseif strcmp('out', type)
-                    outputFiles(end+1) = sscanf(simID, '%u');
+                    outputFiles(end+1) = simID;
                 end
             end
             inputFiles = sort(inputFiles);
@@ -61,9 +66,17 @@ classdef InputTracker
         end
         
         function [obj, reservedFiles] = reserveFilesToProcess(obj, numFiles)
-            reservedFiles = obj.unprocessedInputFiles(1:numFiles);
+            if -1 == numFiles
+                reservedFiles = obj.unprocessedInputFiles;
+            else
+                reservedFiles = obj.unprocessedInputFiles(1:numFiles);
+            end
             obj.unprocessedInputFiles = setdiff(obj.unprocessedInputFiles, reservedFiles);
             obj.inprocessInputFiles = union(obj.inprocessInputFiles, reservedFiles);
+        end
+        function jsonObject = decodeSimulationInput(obj, simID)
+            jsonText = fileread(obj.directory + "/" + num2str(simID) + "_in.json");
+            jsonObject = jsondecode(jsonText);
         end
     end
     methods(Static)
@@ -74,9 +87,9 @@ classdef InputTracker
         
         function [simID, type] = parseFileName(fileName)
             r1 = regexp(fileName, '_', 'split');
-            r2 = regexp(r1(2), '\.', 'split');
-            r1 = r1(1);
-            r2 = r2(1);
+            r2 = regexp(r1{2}, '\.', 'split');
+            r1 = r1{1};
+            r2 = r2{1};
             simID = sscanf(r1, '%u');
             type = r2;
         end
