@@ -33,7 +33,12 @@ classdef InputTracker
         function obj = update(obj)
             filesInDirectory = dir(obj.directory);
             filesInDirectory = filesInDirectory(~[filesInDirectory.isdir]);
-            filesInDirectory = filesInDirectory(endsWith({filesInDirectory.name}, '.json'));
+            inputFilesInDirectory = filesInDirectory(endsWith({filesInDirectory.name}, '.input'));
+            outputFilesInDirectory = filesInDirectory(endsWith({filesInDirectory.name}, '.output'));
+            inputFilesInDirectory = struct2table(inputFilesInDirectory);
+            outputFilesInDirectory = struct2table(outputFilesInDirectory);
+            filesInDirectory = [inputFilesInDirectory; outputFilesInDirectory];
+            filesInDirectory = table2struct(filesInDirectory);
             
             if isempty(filesInDirectory)
                 return;
@@ -44,9 +49,9 @@ classdef InputTracker
                 file = filesInDirectory(fileIndex);
                 fileName = file.name;
                 [simID, type] = InputTracker.parseFileName(fileName);
-                if strcmp('in', type)
+                if strcmp('input', type)
                     inputFiles(end+1) = simID;
-                elseif strcmp('out', type)
+                elseif strcmp('output', type)
                     outputFiles(end+1) = simID;
                 end
             end
@@ -77,7 +82,7 @@ classdef InputTracker
             obj.inprocessInputFiles = union(obj.inprocessInputFiles, reservedFiles);
         end
         function jsonObject = decodeSimulationInput(obj, simID)
-            jsonText = fileread(obj.directory + "/" + num2str(simID) + "_in.json");
+            jsonText = fileread(obj.directory + "/" + num2str(simID) + ".input");
             jsonObject = jsondecode(jsonText);
         end
         function obj = encodeSimulationOutput(obj, simID, simulationOutput)
@@ -87,10 +92,10 @@ classdef InputTracker
             jsonObject = struct();
             for i = 1:length(fields)
                 field = fields{i};
-                jsonObject.(field) = simulationOutput.(field);
+                jsonObject.outputs.(field) = simulationOutput.(field);
             end
             encodedJson = jsonencode(jsonObject);
-            fid = fopen(obj.directory + "/" + string(simID) + "_out.json", 'w');
+            fid = fopen(obj.directory + "/" + string(simID) + ".output", 'w');
             fprintf(fid, "%s", encodedJson);
             fclose(fid);
         end
@@ -102,12 +107,10 @@ classdef InputTracker
         end
         
         function [simID, type] = parseFileName(fileName)
-            r1 = regexp(fileName, '_', 'split');
-            r2 = regexp(r1{2}, '\.', 'split');
-            r1 = r1{1};
-            r2 = r2{1};
-            simID = sscanf(r1, '%u');
-            type = r2;
+            r1 = regexp(fileName, '\.', 'split');
+            simID = r1{1};
+            type = r1{2};
+            simID = sscanf(simID, '%u');
         end
 
 %             function jsonText = encodeSimulationInput(fileName)
