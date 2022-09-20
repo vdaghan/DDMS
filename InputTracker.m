@@ -94,6 +94,10 @@ classdef InputTracker
                 field = fields{i};
                 jsonObject.outputs.(field) = simulationOutput.(field);
             end
+            stopEvent = simulationOutput.SimulationMetadata.ExecutionInfo.StopEvent;
+            if (strcmp(stopEvent, 'DiagnosticError'))
+                jsonObject.error = simulationOutput.ErrorMessage;
+            end
             encodedJson = jsonencode(jsonObject);
             fid = fopen(obj.directory + "/" + string(simID) + ".output", 'w');
             fprintf(fid, "%s", encodedJson);
