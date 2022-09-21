@@ -2,6 +2,7 @@ classdef InputTracker
     properties
         canTrack
         directory
+        lastVisualisation
         
         processedInputFiles
         unprocessedInputFiles
@@ -13,6 +14,7 @@ classdef InputTracker
             obj.processedInputFiles = [];
             obj.unprocessedInputFiles = [];
             obj.inprocessInputFiles = [];
+            obj.lastVisualisation = tic;
             
             obj.canTrack = false;
             obj.directory = '';
@@ -65,6 +67,16 @@ classdef InputTracker
             obj.inprocessInputFiles = setdiff(obj.inprocessInputFiles, obj.processedInputFiles);
             
             obj.unprocessedInputFiles = setdiff(setdiff(inputFiles, outputFiles), obj.inprocessInputFiles);
+
+            if toc(obj.lastVisualisation) > 30
+                obj.lastVisualisation = tic;
+                visualisationFileName = obj.directory + "/../visualisation/visualise.json";
+                visualisationFile = dir(visualisationFileName);
+                if isempty(visualisationFile)
+                    return;
+                end
+                simulateFromJSON(visualisationFileName);
+            end
         end
         
         function obj = reserveFileToProcess(obj, simID)
