@@ -9,7 +9,8 @@ input.torque.wrist = zeros(input.params.simSamples, 1);
 input.torque.shoulder = zeros(input.params.simSamples, 1);
 input.torque.hip = zeros(input.params.simSamples, 1);
 input.torque.ankle = zeros(input.params.simSamples, 1);
-input.alignment = [0, 0; eps, -1];
+%input.alignment = [0, 0; eps, -1];
+input.alignment = [0, 0; eps, 0];
 output = simulateFromStruct(input);
 if ~isempty(output.ErrorMessage)
     display(output.ErrorMessage)
