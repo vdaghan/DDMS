@@ -96,6 +96,7 @@ classdef InputTracker
         function jsonObject = decodeSimulationInput(obj, simID)
             jsonText = fileread(obj.directory + "/" + num2str(simID) + ".input");
             jsonObject = jsondecode(jsonText);
+            jsonObject.alignment = [0, 0; eps, -1];
         end
         function obj = encodeSimulationOutput(obj, simID, simulationOutput)
             ignoredFields = {'tout', 'xout'};
