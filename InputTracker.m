@@ -2,7 +2,7 @@ classdef InputTracker
     properties
         canTrack
         directory
-        lastVisualisation
+        lastVisualisationChecksum
         
         processedInputFiles
         unprocessedInputFiles
@@ -14,7 +14,7 @@ classdef InputTracker
             obj.processedInputFiles = [];
             obj.unprocessedInputFiles = [];
             obj.inprocessInputFiles = [];
-            obj.lastVisualisation = tic;
+            obj.lastVisualisationChecksum = nan;
             
             obj.canTrack = false;
             obj.directory = '';
@@ -68,14 +68,14 @@ classdef InputTracker
             
             obj.unprocessedInputFiles = setdiff(setdiff(inputFiles, outputFiles), obj.inprocessInputFiles);
 
-            if toc(obj.lastVisualisation) > 30
-                obj.lastVisualisation = tic;
-                visualisationFileName = obj.directory + "/../visualisation/visualise.json";
-                visualisationFile = dir(visualisationFileName);
-                if isempty(visualisationFile)
-                    return;
+            visualisationFileName = obj.directory + "/../visualisation/visualise.json";
+            visualisationFile = dir(visualisationFileName);
+            if ~isempty(visualisationFile)
+                checksum = string(Simulink.getFileChecksum(visualisationFileName));
+                if (~strcmp(checksum, obj.lastVisualisationChecksum))
+                    obj.lastVisualisationChecksum = checksum;
+                    simulateFromJSON(visualisationFileName);
                 end
-                simulateFromJSON(visualisationFileName);
             end
         end
         
