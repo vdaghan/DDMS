@@ -33,6 +33,7 @@ while (loop)
                 simulationObject = inputTracker.decodeSimulationInput(simID);
                 simulationInput = Simulink.SimulationInput(projectSettings.name);
                 simulationInput = simulationInput.setVariable('simulationId', simID); % This is stupid...
+                simulationInput = simulationInput.setModelParameter('TimeOut', simulationObject.timeout); % This is stupid...
                 fnames = fieldnames(simulationObject);
                 for findex = 1:length(fnames)
                     fieldName = fnames{findex};

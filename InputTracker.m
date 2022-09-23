@@ -94,9 +94,7 @@ classdef InputTracker
             obj.inprocessInputFiles = union(obj.inprocessInputFiles, reservedFiles);
         end
         function jsonObject = decodeSimulationInput(obj, simID)
-            jsonText = fileread(obj.directory + "/" + num2str(simID) + ".input");
-            jsonObject = jsondecode(jsonText);
-            jsonObject.alignment = [0, 0; eps, -1];
+            jsonObject = jsonFileToStruct(obj.directory + "/" + num2str(simID) + ".input");
         end
         function obj = encodeSimulationOutput(obj, simID, simulationOutput)
             ignoredFields = {'tout', 'xout'};
@@ -111,6 +109,7 @@ classdef InputTracker
             if (strcmp(stopEvent, 'DiagnosticError'))
                 jsonObject.error = simulationOutput.ErrorMessage;
             end
+            jsonObject.metadata.totalTime = simulationOutput.SimulationMetadata.TimingInfo.TotalElapsedWallTime;
             encodedJson = jsonencode(jsonObject);
             fid = fopen(obj.directory + "/" + string(simID) + ".output", 'w');
             fprintf(fid, "%s", encodedJson);
