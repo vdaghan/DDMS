@@ -71,7 +71,12 @@ classdef InputTracker
             visualisationFileName = obj.directory + "/../visualisation/visualise.json";
             visualisationFile = dir(visualisationFileName);
             if ~isempty(visualisationFile)
-                checksum = string(Simulink.getFileChecksum(visualisationFileName));
+                checksum = obj.lastVisualisationChecksum;
+                try
+                    checksum = string(Simulink.getFileChecksum(visualisationFileName));
+                catch
+
+                end
                 if (~strcmp(checksum, obj.lastVisualisationChecksum))
                     obj.lastVisualisationChecksum = checksum;
                     simulateFromJSON(visualisationFileName);
