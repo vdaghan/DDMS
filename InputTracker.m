@@ -123,8 +123,7 @@ classdef InputTracker
     end
     methods(Static)
         function jsonObject = decodeFile(fileName)
-            jsonText = fileread(fileName);
-            jsonObject = jsondecode(jsonText);
+            jsonObject = jsonFileToStruct(fileName);
         end
         
         function [simID, type] = parseFileName(fileName)
