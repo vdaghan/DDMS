@@ -37,10 +37,23 @@ classdef InputTracker
             filesInDirectory = filesInDirectory(~[filesInDirectory.isdir]);
             inputFilesInDirectory = filesInDirectory(endsWith({filesInDirectory.name}, '.input'));
             outputFilesInDirectory = filesInDirectory(endsWith({filesInDirectory.name}, '.output'));
-            inputFilesInDirectory = struct2table(inputFilesInDirectory);
-            outputFilesInDirectory = struct2table(outputFilesInDirectory);
-            filesInDirectory = [inputFilesInDirectory; outputFilesInDirectory];
-            filesInDirectory = table2struct(filesInDirectory);
+            inputFilenamesInDirectory = {};
+            fileNamesInDirectory = {};
+            if (~isempty(inputFilesInDirectory))
+                inputFilenamesInDirectory = {inputFilesInDirectory.name};
+                fileNamesInDirectory = [fileNamesInDirectory, inputFilenamesInDirectory];
+            end
+            outputFilenamesInDirectory = {};
+            if (~isempty(outputFilesInDirectory))
+                outputFilenamesInDirectory = {outputFilesInDirectory.name};
+                fileNamesInDirectory = [fileNamesInDirectory, outputFilenamesInDirectory];
+            end
+            %fileNamesInDirectory = {inputFilenamesInDirectory; outputFilenamesInDirectory};
+%             inputFilesInDirectory = struct2table(inputFilesInDirectory);
+%             outputFilesInDirectory = struct2table(outputFilesInDirectory);
+%             filesInDirectory = [inputFilesInDirectory.name; outputFilesInDirectory.name];
+%             filesInDirectory = table2struct(filesInDirectory);
+            filesInDirectory = fileNamesInDirectory;
             
             if isempty(filesInDirectory)
                 return;
@@ -48,8 +61,8 @@ classdef InputTracker
             inputFiles = [];
             outputFiles = [];
             for fileIndex = 1:length(filesInDirectory)
-                file = filesInDirectory(fileIndex);
-                fileName = file.name;
+                fileName = filesInDirectory{fileIndex};
+                %fileName = file.name;
                 [simID, type] = InputTracker.parseFileName(fileName);
                 if strcmp('input', type)
                     inputFiles(end+1) = simID;
