@@ -32,6 +32,7 @@ while (loop)
             for simID = simIDList
                 simulationObject = inputTracker.decodeSimulationInput(simID);
                 simulationInput = Simulink.SimulationInput(projectSettings.name);
+                simulationInput = simulationInput.setModelParameter('SimulationMode', 'rapid', 'RapidAcceleratorUpToDateCheck', 'off');
                 simulationInput = simulationInput.setVariable('simulationId', simID); % This is stupid...
                 simulationInput = simulationInput.setModelParameter('TimeOut', simulationObject.timeout); % This is stupid...
                 fnames = fieldnames(simulationObject);
