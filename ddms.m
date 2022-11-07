@@ -31,8 +31,13 @@ while (loop)
         if ~isempty(simIDList)
             for simID = simIDList
                 simulationObject = inputTracker.decodeSimulationInput(simID);
+                if ~isstruct(simulationObject)
+                    continue;
+                end
                 simulationInput = Simulink.SimulationInput(projectSettings.name);
-                simulationInput = simulationInput.setModelParameter('SimulationMode', 'rapid', 'RapidAcceleratorUpToDateCheck', 'off');
+                %rtp = Simulink.BlockDiagram.buildRapidAcceleratorTarget(projectSettings.name);
+                %simulationInput = simulationInput.setModelParameter('SimulationMode', 'rapid', 'RapidAcceleratorUpToDateCheck', 'off');
+                %simulationInput = simulationInput.setModelParameter('SimCompilerOptimisation', 'on');
                 simulationInput = simulationInput.setVariable('simulationId', simID); % This is stupid...
                 simulationInput = simulationInput.setModelParameter('TimeOut', simulationObject.timeout); % This is stupid...
                 fnames = fieldnames(simulationObject);
