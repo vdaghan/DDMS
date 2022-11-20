@@ -121,10 +121,17 @@ classdef InputTracker
             jsonObject = struct();
             for i = 1:length(fields)
                 field = fields{i};
-                jsonObject.outputs.(field) = simulationOutput.(field);
+                r = regexp(field, '_', 'split');
+                if 1 == length(r)
+                    jsonObject.outputs.(field) = simulationOutput.(field);
+                else
+                    structName = r{1};
+                    varName = r{2};
+                    jsonObject.(structName).(varName) = simulationOutput.(field);
+                end
             end
             stopEvent = simulationOutput.SimulationMetadata.ExecutionInfo.StopEvent;
-            if (strcmp(stopEvent, 'DiagnosticError'))
+            if (strcmp(stopEvent, 'DiagnosticError') || strcmp(stopEvent, 'TimeOut '))
                 jsonObject.error = simulationOutput.ErrorMessage;
             end
             jsonObject.metadata.totalTime = simulationOutput.SimulationMetadata.TimingInfo.TotalElapsedWallTime;
@@ -135,16 +142,15 @@ classdef InputTracker
         end
     end
     methods(Static)
-        function jsonObject = decodeFile(fileName)
-            jsonObject = jsonFileToStruct(fileName);
-        end
-        
         function [simID, type] = parseFileName(fileName)
             r1 = regexp(fileName, '\.', 'split');
             simID = r1{1};
             type = r1{2};
             simID = sscanf(simID, '%u');
         end
+%         function jsonObject = decodeFile(fileName)
+%             jsonObject = jsonFileToStruct(fileName);
+%         end
 
 %             function jsonText = encodeSimulationInput(fileName)
 %                 matObj = matfile(fileName);
