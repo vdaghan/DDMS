@@ -1,5 +1,6 @@
 clc;
 clear;
+init;
 
 % TODO: zip tracked folder as we process them
 
@@ -30,7 +31,12 @@ while (loop)
         [inputTracker, simIDList] = inputTracker.reserveFilesToProcess(-1);
         if ~isempty(simIDList)
             for simID = simIDList
-                simulationObject = inputTracker.decodeSimulationInput(simID);
+                try
+                    simulationObject = inputTracker.decodeSimulationInput(simID);
+                catch ME
+                    fprintf(ME.identifier);
+                    continue;
+                end
                 if ~isstruct(simulationObject)
                     continue;
                 end

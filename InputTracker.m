@@ -33,37 +33,17 @@ classdef InputTracker
         end
         
         function obj = update(obj)
-            filesInDirectory = dir(obj.directory);
-            filesInDirectory = filesInDirectory(~[filesInDirectory.isdir]);
-            inputFilesInDirectory = filesInDirectory(endsWith({filesInDirectory.name}, '.input'));
-            outputFilesInDirectory = filesInDirectory(endsWith({filesInDirectory.name}, '.output'));
-            inputFilenamesInDirectory = {};
-            fileNamesInDirectory = {};
-            if (~isempty(inputFilesInDirectory))
-                inputFilenamesInDirectory = {inputFilesInDirectory.name};
-                fileNamesInDirectory = [fileNamesInDirectory, inputFilenamesInDirectory];
-            end
-            outputFilenamesInDirectory = {};
-            if (~isempty(outputFilesInDirectory))
-                outputFilenamesInDirectory = {outputFilesInDirectory.name};
-                fileNamesInDirectory = [fileNamesInDirectory, outputFilenamesInDirectory];
-            end
-            %fileNamesInDirectory = {inputFilenamesInDirectory; outputFilenamesInDirectory};
-%             inputFilesInDirectory = struct2table(inputFilesInDirectory);
-%             outputFilesInDirectory = struct2table(outputFilesInDirectory);
-%             filesInDirectory = [inputFilesInDirectory.name; outputFilesInDirectory.name];
-%             filesInDirectory = table2struct(filesInDirectory);
-            filesInDirectory = fileNamesInDirectory;
-            
+            filesInDirectory = [getFilesInDirectory(obj.directory, '.input'), getFilesInDirectory(obj.directory, '.output')];
             if isempty(filesInDirectory)
                 return;
             end
+            
             inputFiles = [];
             outputFiles = [];
             for fileIndex = 1:length(filesInDirectory)
                 fileName = filesInDirectory{fileIndex};
                 %fileName = file.name;
-                [simID, type] = InputTracker.parseFileName(fileName);
+                [simID, type] = parseFilename(fileName);
                 if strcmp('input', type)
                     inputFiles(end+1) = simID;
                 elseif strcmp('output', type)
@@ -131,34 +111,17 @@ classdef InputTracker
                 end
             end
             stopEvent = simulationOutput.SimulationMetadata.ExecutionInfo.StopEvent;
-            if (strcmp(stopEvent, 'DiagnosticError') || strcmp(stopEvent, 'TimeOut '))
-                jsonObject.error = simulationOutput.ErrorMessage;
+            if (strcmp(stopEvent, 'DiagnosticError') || strcmp(stopEvent, 'Timeout'))
+                %jsonObject.error = simulationOutput.ErrorMessage;
+                jsonObject.error = simulationOutput.SimulationMetadata.ExecutionInfo.StopEventDescription;
             end
+            jsonObject.metadata.simulationSteps = length(simulationOutput.tout);
             jsonObject.metadata.totalTime = simulationOutput.SimulationMetadata.TimingInfo.TotalElapsedWallTime;
             encodedJson = jsonencode(jsonObject);
             fid = fopen(obj.directory + "/" + string(simID) + ".output", 'w');
             fprintf(fid, "%s", encodedJson);
             fclose(fid);
         end
-    end
-    methods(Static)
-        function [simID, type] = parseFileName(fileName)
-            r1 = regexp(fileName, '\.', 'split');
-            simID = r1{1};
-            type = r1{2};
-            simID = sscanf(simID, '%u');
-        end
-%         function jsonObject = decodeFile(fileName)
-%             jsonObject = jsonFileToStruct(fileName);
-%         end
-
-%             function jsonText = encodeSimulationInput(fileName)
-%                 matObj = matfile(fileName);
-%                 simulationInput = matObj.inp;
-%                 sourceObj = struct();
-%                 simIn = simulationInput.Variables.simulationInput;
-%                 jsonObject = jsonencode(simulationInput);
-%             end
     end
 end
 
