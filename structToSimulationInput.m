@@ -1,4 +1,5 @@
 function simulationInput = structToSimulationInput(str)
+%     simulationInput = Simulink.SimulationInput("barHandstand");
     simulationInput = Simulink.SimulationInput("handstand");
     simulationInput = simulationInput.setVariable('simulationId', 0); % This is stupid...
     fnames = fieldnames(str);

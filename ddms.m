@@ -8,7 +8,7 @@ nodeMap = containers.Map();
 
 properties = collectProperties();
 projects = findProjects();
-projectSettings = getProjectSettings('handstand');
+projectSettings = getProjectSettings('barHandstand');
 localAddress = getLocalAddress();
 inputTracker = InputTracker();
 server = Node('server', localAddress);
@@ -35,9 +35,11 @@ while (loop)
                     simulationObject = inputTracker.decodeSimulationInput(simID);
                 catch ME
                     fprintf(ME.identifier);
+                    inputTracker = inputTracker.releaseFileFromProcess(simID);
                     continue;
                 end
                 if ~isstruct(simulationObject)
+                    inputTracker = inputTracker.releaseFileFromProcess(simID);
                     continue;
                 end
                 simulationInput = Simulink.SimulationInput(projectSettings.name);
@@ -121,8 +123,8 @@ while (loop)
     % Distribute simulation inputs
 
     % Do some simulation and record outputs
-    simulationInputs = simulationQueue.pop(properties.numCores * 5);
-    %simulationInputs = simulationQueue.pop(-1);
+    %simulationInputs = simulationQueue.pop(properties.numCores * 10);
+    simulationInputs = simulationQueue.pop(-1);
     if ~isempty(simulationInputs)
         simulationOutputs = parsim([simulationInputs{:}]);
         for i = 1:length(simulationOutputs)

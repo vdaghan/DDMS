@@ -79,7 +79,13 @@ classdef InputTracker
         
         function obj = reserveFileToProcess(obj, simID)
             obj.unprocessedInputFiles = setdiff(obj.unprocessedInputFiles, simID);
-            obj.inprocessInputFiles = union(obj.inprocessInputFiles, setID);
+%             obj.inprocessInputFiles = union(obj.inprocessInputFiles, setID);
+            obj.inprocessInputFiles = union(obj.inprocessInputFiles, simID);
+        end
+        
+        function obj = releaseFileFromProcess(obj, simID)
+            obj.inprocessInputFiles = setdiff(obj.inprocessInputFiles, simID);
+            obj.unprocessedInputFiles = union(obj.unprocessedInputFiles, simID);
         end
         
         function [obj, reservedFiles] = reserveFilesToProcess(obj, numFiles)
