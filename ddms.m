@@ -8,7 +8,7 @@ nodeMap = containers.Map();
 
 properties = collectProperties();
 projects = findProjects();
-projectSettings = getProjectSettings('barHandstand');
+projectSettings = getProjectSettings('mizutoriHandstand');
 localAddress = getLocalAddress();
 inputTracker = InputTracker();
 server = Node('server', localAddress);

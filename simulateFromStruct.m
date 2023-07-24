@@ -1,7 +1,9 @@
-function [out, simulationInput] = simulateFromStruct(s)
-    simulationInput = structToSimulationInput(s);
-    
-    load_system('handstand');
+function [out, simulationInput] = simulateFromStruct(s, model)
+    if isempty(model)
+        model = "mizutoriHandstand";
+    end
+    simulationInput = structToSimulationInput(s, model);
+    load_system(model);
 %     load_system('barHandstand');
     warning('off','sm:sli:setup:compile:SteadyStateStartNotSupported');
     beep off;

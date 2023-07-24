@@ -1,8 +1,8 @@
 function individual = getIndividual(dataDirectory, id)
-    if ~isfolder(dataDirectory)
-        individual = NaN;
+    individual = NaN;
+    filename = dataDirectory + "\" + string(id.generation) + "\" + string(id.identifier) + ".deva";
+    if ~isfolder(dataDirectory) || 0 == exist(filename, "file")
         return;
     end
-    jsonText = fileread(dataDirectory + "\" + string(id.generation) + "\" + string(id.identifier) + ".deva");
-    individual = jsondecode(jsonText);
+    individual = getIndividualFromFile(filename);
 end

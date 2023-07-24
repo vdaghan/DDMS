@@ -1,4 +1,4 @@
-function out = simulateFromFile(model)
+function out = importIndividualFromFile()
     jsontext = fileread('trackedDirectory.json');
     directory = jsondecode(jsontext);
     [fileName, path] = uigetfile({'*.deva';'*.in'}, 'Select a file', directory);
@@ -10,11 +10,6 @@ function out = simulateFromFile(model)
     out = jsondecode(jsonText);
     simin = out.genotype;
     simin.alignment = [0, simin.alignment; eps, -1];
-    if isempty(model)
-        model = "mizutoriHandstand";
-    end
-    simulateFromStruct(simin, model);
-%     smwritevideo('handstand', [directory, '\..\', fileName, '.avi'], 'VideoFormat', 'uncompressed avi', 'FrameSize', [1920, 1080]);
 
     torques = out.genotype.torque;
     torqueFields = fieldnames(torques);

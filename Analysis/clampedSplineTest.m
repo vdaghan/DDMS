@@ -20,7 +20,9 @@ points = [[1,2]; [64,16]; [128,-5]; [192,-16]; [256,4]];
 %points = [[1,0]; [256,0]];
 x = (1:256)';
 y = nan(length(x), 1);
-plot(x, evaluateClampedSpline(points, x))
+plot(x*0.01, evaluateClampedSpline(points, x))
+xlabel("x")
+ylabel("y")
 
 function yvec = evaluateClampedSpline(points, xvec)
     vecSize = size(xvec, 1);
